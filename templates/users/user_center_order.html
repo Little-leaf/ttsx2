@@ -1,0 +1,127 @@
+{# 继承父模板 #}
+{% extends 'common/base.html' %}
+
+{# 加载标签 #}
+{% load staticfiles %}
+{% block header_js %}
+    <script src="{% static 'js/jquery-1.12.4.min.js' %}"></script>
+    <script>
+    $(function () {
+
+
+
+        $('.order_goods_list').each(function () {
+               //商品的数量
+        num = parseInt($(this).find('.col03').html());
+{#        alert(num);#}
+        //商品的单价
+        price = parseFloat($(this).find('.col02').find('em').html());
+{#        alert(price);#}
+            total = num * price;
+            $(this).find('.col04').html(total)
+        })
+
+    })
+    </script>
+{% endblock header_js %}
+
+
+{% block body %}
+
+    {# 包含用户登陆状态 #}
+
+
+    {% include 'common/status.html'  %}
+    <div class="search_bar clearfix">
+        <a href="{% url 'goods:index' %}" class="logo fl"><img src="{% static 'images/logo.png' %}"></a>
+        <div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;用户中心</div>
+        <div class="search_con fr">
+            <input type="text" class="input_text fl" name="" placeholder="搜索商品">
+            <input type="button" class="input_btn fr" name="" value="搜索">
+        </div>
+    </div>
+    <div class="main_con clearfix">
+    		{% include 'users/commen_left_menu.html' with flag='order' %}
+
+		<div class="right_content clearfix">
+				<h3 class="common_title2">全部订单</h3>
+
+            {% for order in orders %}
+				<ul class="order_list_th w978 clearfix">
+					<li class="col01">{{ order.create_time }}</li>
+					<li class="col02">订单号：{{ order.order_number }}</li>
+
+					<li class="col02 stress">
+                        {% if order.order_status == 1 %}
+                            待支付
+                        {% elif order.order_status == 2 %}
+                            待发货
+                        {% elif order.order_status == 3 %}
+                            待收货
+                        {% elif order.order_status == 4 %}
+                            已完成
+                        {% endif %}
+                    </li>
+				</ul>
+
+
+				<table class="order_list_table w980">
+					<tbody>
+						<tr>
+							<td width="55%">
+                                {% for goods in order.goodsdetail_set.all %}
+                                    {{ goods.id }}
+								<ul class="order_goods_list clearfix">
+
+									<li class="col01"><img src="{% static goods.detail_img %}"></li>
+									<li class="col02">{{goods.detail_name}}<em>{{ goods.detail_price }}元/{{ goods.detail_unit }}</em></li>
+									<li class="col03" value="">{{ goods.detail_amount }}</li>
+									<li class="col04">{{ goods.detail_price }}元</li>
+								</ul>
+                                {% endfor %}
+							</td>
+							<td width="15%">{{ order.total }}元</td>
+							<td width="15%">
+
+                                {% if order.order_status == 1 %}
+                                待支付
+                                {% elif order.order_status == 2 %}
+                                    待发货
+                                {% elif order.order_status == 3 %}
+                                    待收货
+                                {% elif order.order_status == 4 %}
+                                    已完成
+                                {% endif %}
+
+                            </td>
+							<td width="15%"><a href="#" class="oper_btn">去付款</a></td>
+						</tr>
+					</tbody>
+				</table>
+
+				{% endfor %}
+
+
+				<div class="pagenation">
+
+                {% if orders.has_previous%}
+					<a href="?page={{ orders.previous_page_number }}">上一页</a>
+                {% endif %}
+
+                    {% for index in paginator.page_range %}
+                        {% if index == orders.number %}
+					    <a href="?page={{ index }}" class="active">{{ index }}</a>
+                        {% else %}
+                        <a href="?page={{ index }}">{{ index }}</a>
+                        {% endif %}
+                    {% endfor %}
+
+                {% if orders.has_next %}
+					<a href="?page={{ orders.next_page_number}}">下一页></a>
+                {% endif %}
+
+				</div>
+		</div>
+	</div>
+
+{% endblock body %}

@@ -1,0 +1,61 @@
+{# 继承父模板 #}
+{% extends 'common/base.html' %}
+
+{# 加载标签 #}
+{% load staticfiles %}
+
+
+
+{% block body %}
+
+    {# 包含用户登陆状态 #}
+    {% include 'common/status.html'%}
+
+	<div class="search_bar clearfix">
+		<a href="{% url 'goods:index' %}" class="logo fl"><img src="{% static 'images/logo.png' %}"></a>
+		<div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;用户中心</div>
+		<div class="search_con fr">
+			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
+			<input type="button" class="input_btn fr" name="" value="搜索">
+		</div>		
+	</div>
+
+	<div class="main_con clearfix">
+		    {% include 'users/commen_left_menu.html' with flag='site'%}
+
+		<div class="right_content clearfix">
+				<h3 class="common_title2">收货地址</h3>
+				<div class="site_con">
+					<dl>
+						<dt>当前地址：</dt>
+						<dd>{{ user.user_addr }} （{{ user.user_recv }} 收） {{ user.user_tel }}</dd>
+					</dl>					
+				</div>
+				<h3 class="common_title2">编辑地址</h3>
+				<div class="site_con">
+					<form method="post" action="{% url 'users:address_edit' %}">
+                        {% csrf_token %}
+						<div class="form_group">
+							<label>收件人：</label>
+							<input type="text" name="user_recv">
+						</div>
+						<div class="form_group form_group2">
+							<label>详细地址：</label>
+							<textarea name="user_addr" class="site_area"></textarea>
+						</div>
+						<div class="form_group">
+							<label>邮编：</label>
+							<input type="text" name="user_code">
+						</div>
+						<div class="form_group">
+							<label>手机：</label>
+							<input type="text" name="user_tel">
+						</div>
+
+						<input type="submit" name="" value="提交" class="info_submit">
+					</form>
+				</div>
+		</div>
+	</div>
+
+{% endblock %}
